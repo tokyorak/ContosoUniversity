@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using CUniversity.Data;
+using ContosoUniversity.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
