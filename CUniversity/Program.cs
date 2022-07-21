@@ -31,7 +31,10 @@ using(var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
 
     var context = services.GetRequiredService<SchoolContext>();
-    context.Database.EnsureCreated();
+
+    // We use migrations from now on
+    // context.Database.EnsureCreated(); 
+    
     DbInitializer.Initialize(context);
 }
 
