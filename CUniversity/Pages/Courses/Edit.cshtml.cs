@@ -11,7 +11,7 @@ using CUniversity.Models;
 
 namespace CUniversity.Pages.Courses
 {
-    public class EditModel : PageModel
+    public class EditModel : DepartmentNamePageModel
     {
         private readonly CUniversity.Data.SchoolContext _context;
 
@@ -30,44 +30,43 @@ namespace CUniversity.Pages.Courses
                 return NotFound();
             }
 
-            var course =  await _context.Courses.FirstOrDefaultAsync(m => m.CourseID == id);
-            if (course == null)
+            Course =  await _context.Courses
+                .Include(c => c.Department)
+                .FirstOrDefaultAsync(m => m.CourseID == id);
+
+            if (Course == null)
             {
                 return NotFound();
             }
-            Course = course;
-           ViewData["DepartmentID"] = new SelectList(_context.Departments, "DepartmentID", "DepartmentID");
+            
+            // Select the current DepartmentID
+            PopulateDepartmentsDropDownList(_context, Course.DepartmentID);
             return Page();
         }
 
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see https://aka.ms/RazorPagesCRUD.
-        public async Task<IActionResult> OnPostAsync()
+        public async Task<IActionResult> OnPostAsync(int? id)
         {
-            if (!ModelState.IsValid)
+            if(id == null)
             {
-                return Page();
+                return NotFound();
+            }
+            
+            var courseToUpdate = await _context.Courses.FindAsync(id);
+
+            if(courseToUpdate == null)
+            {
+                return NotFound();
             }
 
-            _context.Attach(Course).State = EntityState.Modified;
-
-            try
+            if(await TryUpdateModelAsync(courseToUpdate, "course", c => c.Credits, c => c.DepartmentID, c => c.Title))
             {
                 await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!CourseExists(Course.CourseID))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return RedirectToPage("./Index");
             }
 
-            return RedirectToPage("./Index");
+            return Page();
         }
 
         private bool CourseExists(int id)
