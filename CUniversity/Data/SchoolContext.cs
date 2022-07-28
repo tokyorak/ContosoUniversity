@@ -30,6 +30,9 @@ namespace CUniversity.Data
             modelBuilder.Entity<Enrollment>().ToTable("Enrollment");
             modelBuilder.Entity<Student>().ToTable("Student");
             modelBuilder.Entity<Instructor>().ToTable("Instructor");
+            modelBuilder.Entity<Department>()
+                .Property(d => d.ConcurrencyToken)
+                .IsConcurrencyToken();
         }
     }
 }
